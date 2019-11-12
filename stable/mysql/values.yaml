@@ -111,7 +111,7 @@ securityContext:
   enabled: false
   runAsUser: 999
   fsGroup: 999
-  readOnly: false
+  readOnly: true
 
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
