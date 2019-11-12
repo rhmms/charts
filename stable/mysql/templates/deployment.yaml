@@ -147,6 +147,8 @@ spec:
           timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+        securityContext:
+          readOnlyRootFilesystem: {{ .Values.securityContext.readOnly }}
         volumeMounts:
         - name: data
           mountPath: /var/lib/mysql
@@ -168,6 +170,10 @@ spec:
         - name: certificates
           mountPath: /ssl
         {{- end }}
+        - name: var-log-mysql
+          mountPath: /var/log/mysql
+        - name: var-run-mysql
+          mountPath: /var/run/mysqld
         {{- if .Values.extraVolumeMounts }}
 {{ tpl .Values.extraVolumeMounts . | indent 8 }}
         {{- end }}
@@ -213,6 +219,8 @@ spec:
         resources:
 {{ toYaml .Values.metrics.resources | indent 10 }}
       {{- end }}
+        securityContext:
+          readOnlyRootFilesystem: {{ .Values.securityContext.readOnly }}
       volumes:
       {{- if .Values.configurationFiles }}
       - name: configurations
@@ -235,7 +243,11 @@ spec:
           claimName: {{ .Values.persistence.existingClaim | default (include "mysql.fullname" .) }}
       {{- else }}
         emptyDir: {}
-      {{- end -}}
+      {{- end }}
+      - name: var-run-mysql
+        emptyDir: {}
+      - name: var-log-mysql
+        emptyDir: {}
       {{- if .Values.extraVolumes }}
 {{ tpl .Values.extraVolumes . | indent 6 }}
       {{- end }}
