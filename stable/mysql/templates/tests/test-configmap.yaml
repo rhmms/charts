@@ -11,13 +11,13 @@ metadata:
     release: "{{ .Release.Name }}"
 data:
   run.sh: |-
-    {{- if .Values.ssl.enabled | and .Values.mysqlRootPassword }}
+    {{- if .Values.ssl.enabled }}
     @test "Testing SSL MySQL Connection" {
-      mysql --host={{ template "mysql.fullname" . }} --port={{ .Values.service.port | default "3306" }} --ssl-cert=/ssl/server-cert.pem --ssl-key=ssl/server-key.pem -u root -p{{ .Values.mysqlRootPassword }}
+      mysql --host={{ template "mysql.fullname" . }} --port={{ .Values.service.port | default "3306" }} --ssl-cert=/ssl/server-cert.pem --ssl-key=ssl/server-key.pem -u root -p${MYSQL_ROOT_PASSWORD}
     }
-    {{- else if .Values.mysqlRootPassword }}
+    {{- else }}
     @test "Testing MySQL Connection" {
-      mysql --host={{ template "mysql.fullname" . }} --port={{ .Values.service.port | default "3306" }} -u root -p{{ .Values.mysqlRootPassword }}
+      mysql --host={{ template "mysql.fullname" . }} --port={{ .Values.service.port | default "3306" }} -u root -p${MYSQL_ROOT_PASSWORD}
     }
     {{- end }}
 {{- end }}

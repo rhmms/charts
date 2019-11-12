@@ -29,6 +29,23 @@ spec:
     - name: {{ .Release.Name }}-test
       image: "{{ .Values.image }}:{{ .Values.imageTag }}"
       command: ["/tools/bats/bats", "-t", "/tests/run.sh"]
+      env:
+      - name: MYSQL_ROOT_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: {{ template "mysql.secretName" . }}
+            key: mysql-root-password
+            {{- if .Values.mysqlAllowEmptyPassword }}
+            optional: true
+            {{- end }}
+      - name: MYSQL_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: {{ template "mysql.secretName" . }}
+            key: mysql-password
+            {{- if or .Values.mysqlAllowEmptyPassword (empty .Values.mysqlUser) }}
+            optional: true
+            {{- end }}
       volumeMounts:
       - mountPath: /tests
         name: tests
